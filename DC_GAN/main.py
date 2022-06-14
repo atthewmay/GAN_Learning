@@ -67,11 +67,11 @@ for epoch in range(NUM_EPOCHS):
         #
         disc_real = disc(real).reshape(-1)
         disc_loss_real = criterion(disc_real,torch.ones_like(disc_real))
-        disc_fake = disc(fake).reshape(-1)
-        disc_loss_fake = criterion(disc_fake,torch.ones_like(disc_fake))
+        disc_fake = disc(fake.detach()).reshape(-1)
+        disc_loss_fake = criterion(disc_fake,torch.zeros_like(disc_fake))
         loss_disc = (disc_loss_real+disc_loss_fake)/2
         disc.zero_grad()
-        loss_disc.backward(retain_graph=True)
+        loss_disc.backward()
         opt_disc.step()
 
         output = disc(fake).reshape(-1)
