@@ -11,8 +11,8 @@ import argparse
 
 save_path = "saved_models/"
 parser = argparse.ArgumentParser()
-parser.add_argument('--resume_training',type=bool,default=None)
-parser.add_argument('--save_models',type=bool,default=None)
+parser.add_argument('--resume_training',action="store_true")
+parser.add_argument('--save_models',action="store_true")
 args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
