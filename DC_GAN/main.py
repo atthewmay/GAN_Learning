@@ -7,6 +7,13 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import models as m
+import argparse
+
+save_path = "saved_models/"
+parser = argparse.ArgumentParser()
+parser.add_argument('--resume_training',type=bool,default=None)
+parser.add_argument('--save_models',type=bool,default=None)
+args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using {device}")
@@ -33,6 +40,9 @@ dataset = datasets.MNIST(root="dataset/",train=True,transform=transforms,downloa
 loader = DataLoader(dataset,batch_size=BATCH_SIZE,shuffle=True)
 gen = m.Generator(Z_DIM,CHANNELS_IMG,FEATURES_GEN).to(device)
 disc = m.Discriminator(CHANNELS_IMG,FEATURES_DISC).to(device)
+if args.resume_training:
+    gen.load_state_dict(torch.load(save_path+"generator_model"))
+    disc.load_state_dict(torch.load(save_path+"discriminator_model"))
 m.initialize_weights(gen)
 m.initialize_weights(disc)
 
@@ -79,6 +89,9 @@ for epoch in range(NUM_EPOCHS):
                 grid_fake = torchvision.utils.make_grid(fake[:32],normalize=True)
                 writer_real.add_image("real",grid_real,global_step = step)
                 writer_fake.add_image("fake",grid_fake,global_step = step)
+            if args.save_models:
+                torch.save(disc.state_dict(),save_path+"discriminator_model")
+                torch.save(gen.state_dict(),save_path+"generator_model")
         step += 1
 
 
