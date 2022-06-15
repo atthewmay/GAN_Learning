@@ -72,8 +72,8 @@ for epoch in range(NUM_EPOCHS):
 #         critic_loss_real = criterion(critic_real,torch.ones_like(critic_real))
 #         critic_loss_fake = criterion(critic_fake,torch.zeros_like(critic_fake))
             loss_critic = - (torch.mean(critic_real) - torch.mean(critic_fake))
-            critic.zero_grad(retain_graph=True) # Ah, right ,else would erase intermediate states from Generator.
-            loss_critic.backward()
+            critic.zero_grad() # Ah, right ,else would erase intermediate states from Generator.
+            loss_critic.backward(retain_graph=True)
             opt_critic.step()
 
             for p in critic.parameters():
