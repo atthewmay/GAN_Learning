@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import models as m
 import argparse
+from utils import gradient_penalty
 
 save_path = "saved_models/"
 parser = argparse.ArgumentParser()
@@ -17,7 +18,7 @@ args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using {device}")
-LEARNING_RATE = 5e-5
+LEARNING_RATE = 1e-4
 BATCH_SIZE = 64
 IMAGE_SIZE = 64
 CHANNELS_IMG = 1
@@ -27,7 +28,8 @@ NUM_EPOCHS = 5
 FEATURES_DISC = 64
 FEATURES_GEN = 64
 CRITIC_ITERATIONS = 5
-WEIGHT_CLIP = 0.01
+LAMBDA_GP = 10
+# WEIGHT_CLIP = 0.01
 
 transforms = transforms.Compose(
         [
@@ -48,8 +50,8 @@ if args.resume_training:
 m.initialize_weights(gen)
 m.initialize_weights(critic)
 
-opt_gen = optim.RMSprop(gen.parameters(),lr = LEARNING_RATE)
-opt_critic = optim.RMSprop(critic.parameters(),lr = LEARNING_RATE)
+opt_gen = optim.Adam(gen.parameters(),lr = LEARNING_RATE,betas = (0.0, 0.9))
+opt_critic = optim.Adam(critic.parameters(),lr = LEARNING_RATE,betas = (0.0, 0.9))
 
 fixed_noise = torch.randn(32,Z_DIM,1,1).to(device)
 
@@ -71,13 +73,14 @@ for epoch in range(NUM_EPOCHS):
             critic_fake = critic(fake).reshape(-1)
 #         critic_loss_real = criterion(critic_real,torch.ones_like(critic_real))
 #         critic_loss_fake = criterion(critic_fake,torch.zeros_like(critic_fake))
-            loss_critic = - (torch.mean(critic_real) - torch.mean(critic_fake))
+            gp = gradient_penalty(critic,real,fake,device=device)
+            loss_critic = - (torch.mean(critic_real) - torch.mean(critic_fake) - LAMBDA_GP*gp)
             critic.zero_grad() # Ah, right ,else would erase intermediate states from Generator.
             loss_critic.backward(retain_graph=True)
             opt_critic.step()
 
-            for p in critic.parameters():
-                p.data.clamp_(-WEIGHT_CLIP,WEIGHT_CLIP)
+#             for p in critic.parameters():
+#                 p.data.clamp_(-WEIGHT_CLIP,WEIGHT_CLIP)
 
 ## Train gen
         output = critic(fake).reshape(-1)
