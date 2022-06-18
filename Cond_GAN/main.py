@@ -44,7 +44,7 @@ transforms = transforms.Compose(
 dataset = datasets.MNIST(root="dataset/",train=True,transform=transforms,download=True)
 
 loader = DataLoader(dataset,batch_size=BATCH_SIZE,shuffle=True)
-gen = m.Generator(Z_DIM,CHANNELS_IMG,FEATURES_GEN,NUM_CLASSES,IMAGE_SIZE,GEN_EMBEDDING).to(device)
+gen = m.Generator(Z_DIM,CHANNELS_IMG,FEATURES_GEN,NUM_CLASSES,GEN_EMBEDDING).to(device)
 critic = m.Discriminator(CHANNELS_IMG,FEATURES_DISC,NUM_CLASSES,IMAGE_SIZE).to(device)
 if args.resume_training:
     gen.load_state_dict(torch.load(save_path+"generator_model"))

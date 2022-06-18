@@ -33,9 +33,8 @@ class Discriminator(nn.Module):
 
 
 class Generator(nn.Module):
-    def __init__(self,z_dim,channels_img,features_g,num_classes, img_size,embed_size):
+    def __init__(self,z_dim,channels_img,features_g,num_classes,embed_size):
         super(Generator,self).__init__()
-        self.image_size  = image_size
         self.net = nn.Sequential(
                 self._block(z_dim+embed_size,features_g*16,4,1,0),
                 self._block(features_g*16,features_g*8,4,2,1),
