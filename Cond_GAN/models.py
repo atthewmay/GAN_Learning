@@ -79,4 +79,3 @@ def test():
     initialize_weights(gen)
     assert gen(z).shape == (N,in_channels,H,W)
 
-test()
