@@ -77,7 +77,7 @@ for epoch in range(NUM_EPOCHS):
             critic_fake = critic(fake,labels).reshape(-1)
 #         critic_loss_real = criterion(critic_real,torch.ones_like(critic_real))
 #         critic_loss_fake = criterion(critic_fake,torch.zeros_like(critic_fake))
-            gp = gradient_penalty(critic,real,labels,fake,device=device)
+            gp = gradient_penalty(critic,real,fake,labels,device=device)
             loss_critic = - (torch.mean(critic_real) - torch.mean(critic_fake) - LAMBDA_GP*gp)
             critic.zero_grad() # Ah, right ,else would erase intermediate states from Generator.
             loss_critic.backward(retain_graph=True)
