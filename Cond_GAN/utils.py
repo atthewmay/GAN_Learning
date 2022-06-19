@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
+
 
 def gradient_penalty(critic,real,fake,labels,device="cpu"):
     BATCH_SIZE, C,H,W = real.shape
@@ -19,4 +21,16 @@ def gradient_penalty(critic,real,fake,labels,device="cpu"):
     gradient_norm = gradient.norm(2,dim=1)
     gradient_penalty = torch.mean((gradient_norm - 1)**2)
     return gradient_penalty
+
+def display_embeddings(disc):
+    range_vec = [i for i in range(10)]
+    embeds = disc.embed(range_vec)
+    print(f"shape of embeds is {embeds.shape}")
+    ncols = 3
+    nrow = math.ceil(len(range_vec)/ncols)
+    fig,ax = plt.subplots(ncols,nrows)
+    ax = ax.flatten()
+    for i in range_vec:
+        ax[i].imshow(embeds[i].reshape(8,-1),cmap='grey')
+    plt.show()
 
