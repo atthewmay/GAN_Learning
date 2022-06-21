@@ -52,7 +52,7 @@ if args.resume_training:
     critic.load_state_dict(torch.load(save_path+"criticriminator_model"))
 m.initialize_weights(gen)
 m.initialize_weights(critic)
-print(summary(critic,(1,1,IMAGE_SIZE,IMAGE_SIZE)))
+print(summary(critic,[(1,1,IMAGE_SIZE,IMAGE_SIZE),(1,1)],dtypes=[torch.float,torch.int]))
 
 
 opt_gen = optim.Adam(gen.parameters(),lr = LEARNING_RATE,betas = (0.0, 0.9))
