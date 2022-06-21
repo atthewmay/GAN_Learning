@@ -9,7 +9,6 @@ from torch.utils.tensorboard import SummaryWriter
 import models as m
 import argparse
 from utils import gradient_penalty
-import ipdb
 
 save_path = "saved_models/"
 parser = argparse.ArgumentParser()
@@ -69,7 +68,7 @@ for epoch in range(NUM_EPOCHS):
     for batch_idx, (real,labels) in enumerate(loader):
         real = real.to(device)
         labels = labels.to(device)
-        import ipdb; ipdb.set_trace()
+        import pdb; pdb.set_trace()
         for _ in range(CRITIC_ITERATIONS):
             noise = torch.randn((labels.dim[0],Z_DIM,1,1)).to(device)
 
