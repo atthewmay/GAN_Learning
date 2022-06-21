@@ -27,9 +27,9 @@ def display_embeddings(disc):
     range_vec = [i for i in range(10)]
     embeds = disc.embed(torch.tensor(range_vec))
     print(f"shape of embeds is {embeds.shape}")
-    ncols = 3
-    nrow = math.ceil(len(range_vec)/ncols)
-    fig,ax = plt.subplots(ncols,nrows)
+    ncol = 3
+    nrow = math.ceil(len(range_vec)/ncol)
+    fig,ax = plt.subplots(ncol,nrow)
     ax = ax.flatten()
     for i in range_vec:
         ax[i].imshow(embeds[i].reshape(8,-1),cmap='grey')
