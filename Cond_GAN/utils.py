@@ -25,7 +25,7 @@ def gradient_penalty(critic,real,fake,labels,device="cpu"):
 
 def display_embeddings(disc):
     range_vec = [i for i in range(10)]
-    embeds = disc.embed(torch.tensor(range_vec))
+    embeds = disc.embed(torch.tensor(range_vec)).detach().numpy()
     print(f"shape of embeds is {embeds.shape}")
     ncol = 3
     nrow = math.ceil(len(range_vec)/ncol)
