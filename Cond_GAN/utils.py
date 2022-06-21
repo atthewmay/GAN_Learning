@@ -32,6 +32,6 @@ def display_embeddings(disc):
     fig,ax = plt.subplots(ncol,nrow)
     ax = ax.flatten()
     for i in range_vec:
-        ax[i].imshow(embeds[i].reshape(8,-1),cmap='Greys')
+        ax[i].imshow(embeds[i].reshape(int(math.sqrt(embeds[i].shape[0])),-1),cmap='Greys')
     plt.show()
 
