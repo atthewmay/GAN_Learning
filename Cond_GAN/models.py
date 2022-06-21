@@ -26,7 +26,8 @@ class Discriminator(nn.Module):
                     nn.LeakyReLU(0.2),
                 )
 
-    def forward(self,x,labels):
+    def forward(self,x,labels=torch.tensor([1])):
+        import pdb; pdb.set_trace()
         embedding = self.embed(labels).view(labels.shape[0],1,self.img_size,self.img_size)
         x = torch.cat([x,embedding],dim = 1)
         return self.disc(x)
