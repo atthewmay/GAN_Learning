@@ -69,7 +69,8 @@ for epoch in range(NUM_EPOCHS):
         real = real.to(device)
         labels = labels.to(device)
         for _ in range(CRITIC_ITERATIONS):
-            noise = torch.randn((labels.dim[0],Z_DIM,1,1)).to(device)
+            import pdb; pdb.set_trace()
+            noise = torch.randn((labels.shape[0],Z_DIM,1,1)).to(device)
 
             fake = gen(noise,labels)
             #
