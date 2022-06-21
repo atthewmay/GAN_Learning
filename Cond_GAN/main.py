@@ -6,6 +6,7 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torchinfo import summary
 import models as m
 import argparse
 from utils import gradient_penalty
@@ -20,7 +21,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using {device}")
 LEARNING_RATE = 1e-4
 BATCH_SIZE = 64
-IMAGE_SIZE = 28
+IMAGE_SIZE = 64
 CHANNELS_IMG = 1
 NUM_CLASSES = 10
 GEN_EMBEDDING = 100
@@ -51,6 +52,8 @@ if args.resume_training:
     critic.load_state_dict(torch.load(save_path+"criticriminator_model"))
 m.initialize_weights(gen)
 m.initialize_weights(critic)
+print(summary(critic,(1,1,IMAGE_SIZE,IMAGE_SIZE)))
+
 
 opt_gen = optim.Adam(gen.parameters(),lr = LEARNING_RATE,betas = (0.0, 0.9))
 opt_critic = optim.Adam(critic.parameters(),lr = LEARNING_RATE,betas = (0.0, 0.9))
@@ -69,7 +72,6 @@ for epoch in range(NUM_EPOCHS):
         real = real.to(device)
         labels = labels.to(device)
         for _ in range(CRITIC_ITERATIONS):
-            import pdb; pdb.set_trace()
             noise = torch.randn((labels.shape[0],Z_DIM,1,1)).to(device)
 
             fake = gen(noise,labels)
