@@ -20,7 +20,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using {device}")
 LEARNING_RATE = 1e-4
 BATCH_SIZE = 64
-IMAGE_SIZE = 64
+IMAGE_SIZE = 28
 CHANNELS_IMG = 1
 NUM_CLASSES = 10
 GEN_EMBEDDING = 100
@@ -68,6 +68,7 @@ for epoch in range(NUM_EPOCHS):
     for batch_idx, (real,labels) in enumerate(loader):
         real = real.to(device)
         labels = labels.to(device)
+        import pdb; pdb.set_trace()
         for _ in range(CRITIC_ITERATIONS):
             noise = torch.randn((labels.dim[0],Z_DIM,1,1)).to(device)
 
