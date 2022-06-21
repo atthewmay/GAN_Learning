@@ -68,7 +68,6 @@ for epoch in range(NUM_EPOCHS):
     for batch_idx, (real,labels) in enumerate(loader):
         real = real.to(device)
         labels = labels.to(device)
-        import pdb; pdb.set_trace()
         for _ in range(CRITIC_ITERATIONS):
             noise = torch.randn((labels.dim[0],Z_DIM,1,1)).to(device)
 
