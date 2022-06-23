@@ -45,6 +45,7 @@ class fidCalculator():
         Iv3 = torch.hub.load('pytorch/vision:v0.10.0', 'inception_v3', pretrained=True,aux_logits=False)
         Iv3.eval()
         Iv3_truncated = torch.nn.Sequential(*list(Iv3.children())[:-2])
+        self.device = device
         self.Iv3_truncated = Iv3_truncated.to(device)
         self.Iv3_truncated.eval()
 
@@ -67,8 +68,8 @@ class fidCalculator():
     def calc_FID(self,real,fake):
         real,fake = self.prep_images(real),self.prep_images(fake)
         with torch.no_grad():
-            real_vec = self.Iv3_truncated(self.transforms(real)).detach().numpy().squeeze()
-            fake_vec = self.Iv3_truncated(self.transforms(fake)).detach().numpy().squeeze()
+            real_vec = self.Iv3_truncated(self.transforms(real)).detach().cpu().numpy().squeeze()
+            fake_vec = self.Iv3_truncated(self.transforms(fake)).detach().cpu().numpy().squeeze()
             return self.FID_formula(real_vec,fake_vec)
 
     def FID_formula(self,real_vec,fake_vec):
