@@ -1,7 +1,10 @@
 import math
 import torch
 import torch.nn as nn
+import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.linalg import sqrtm
 
 
 def gradient_penalty(critic,real,fake,labels,device="cpu"):
@@ -34,4 +37,47 @@ def display_embeddings(disc):
     for i in range_vec:
         ax[i].imshow(embeds[i].reshape(int(math.sqrt(embeds[i].shape[0])),-1),cmap='Greys')
     plt.show()
+
+
+#FID STUFF
+class fidCalculator():
+    def __init__(self,device='cpu'):
+        Iv3 = torch.hub.load('pytorch/vision:v0.10.0', 'inception_v3', pretrained=True,aux_logits=False)
+        Iv3.eval()
+        Iv3_truncated = torch.nn.Sequential(*list(Iv3.children())[:-2])
+        self.Iv3_truncated = Iv3_truncated.to(device)
+        self.Iv3_truncated.eval()
+
+        #The following assumes MNIST
+        self.transforms = transforms.Compose(
+                [
+                    transforms.Resize(299),
+                    transforms.CenterCrop(299),
+#                     transforms.ToTensor(),
+                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                ]
+            )
+
+    def prep_images(self,img_batch):
+        if img_batch.shape[1]==1:
+            img_batch = img_batch.expand(-1,3,-1,-1)
+        return img_batch
+
+
+    def calc_FID(self,real,fake):
+        real,fake = self.prep_images(real),self.prep_images(fake)
+        with torch.no_grad():
+            real_vec = self.Iv3_truncated(self.transforms(real)).detach().numpy().squeeze()
+            fake_vec = self.Iv3_truncated(self.transforms(fake)).detach().numpy().squeeze()
+            return self.FID_formula(real_vec,fake_vec)
+
+    def FID_formula(self,real_vec,fake_vec):
+        mu_real,mu_fake = np.mean(real_vec,axis=1),np.mean(fake_vec,axis=1)
+        cov_real,cov_fake = np.cov(real_vec,rowvar=False), np.cov(fake_vec,rowvar=False)
+        matrix_sqrt = sqrtm(np.matmul(cov_real,cov_fake))
+        if np.iscomplexobj(matrix_sqrt):
+            matrix_sqrt = matrix_sqrt.real
+        fid = np.sum((mu_real-mu_fake)**2) + np.trace(cov_real+cov_fake-2*matrix_sqrt)
+        return fid
+
 

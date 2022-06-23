@@ -9,7 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchinfo import summary
 import models as m
 import argparse
-from utils import gradient_penalty
+from utils import gradient_penalty,fidCalculator
 
 save_path = "saved_models/"
 parser = argparse.ArgumentParser()
@@ -32,6 +32,9 @@ FEATURES_DISC = 64
 FEATURES_GEN = 64
 CRITIC_ITERATIONS = 5
 LAMBDA_GP = 10
+CALC_FID = True
+if CALC_FID:
+    fidCalculator = fidCalculator(device=device)
 # WEIGHT_CLIP = 0.01
 
 transforms = transforms.Compose(
@@ -62,6 +65,7 @@ fixed_noise = torch.randn(32,Z_DIM,1,1).to(device)
 
 writer_real = SummaryWriter(f"logs/real")
 writer_fake = SummaryWriter(f"logs/fake")
+writer_fid = SummaryWriter(f"logs/fid")
 step = 0
 
 gen.train()
@@ -108,6 +112,13 @@ for epoch in range(NUM_EPOCHS):
             if args.save_models:
                 torch.save(critic.state_dict(),save_path+"criticriminator_model")
                 torch.save(gen.state_dict(),save_path+"generator_model")
+            if CALC_FID and len(labels)==BATCH_SIZE:
+                fid = fidCalculator.calc_FID(real,fake)
+                writer_fid.add_scalar("FID",fid,global_step = step)
+                print(f"Single Batch FID: \t{fid}")
+                
+
+
         step += 1
 
 
